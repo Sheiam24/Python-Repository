@@ -1,0 +1,586 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyN9fCsPv+4r1yUzDhxozMf0",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/Sheiam24/Python-Repository/blob/main/spark\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 1,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "6JlY8U0FHMZw",
+        "outputId": "81b27142-d621-4339-d7ee-efa72f7164e9"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Collecting pyspark\n",
+            "  Downloading pyspark-3.5.0.tar.gz (316.9 MB)\n",
+            "\u001b[2K     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m316.9/316.9 MB\u001b[0m \u001b[31m4.4 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25h  Preparing metadata (setup.py) ... \u001b[?25l\u001b[?25hdone\n",
+            "Requirement already satisfied: py4j==0.10.9.7 in /usr/local/lib/python3.10/dist-packages (from pyspark) (0.10.9.7)\n",
+            "Building wheels for collected packages: pyspark\n",
+            "  Building wheel for pyspark (setup.py) ... \u001b[?25l\u001b[?25hdone\n",
+            "  Created wheel for pyspark: filename=pyspark-3.5.0-py2.py3-none-any.whl size=317425344 sha256=019d05b4922e0d7d91666972591f9476a836f3fc6a894c928b82390281909ee6\n",
+            "  Stored in directory: /root/.cache/pip/wheels/41/4e/10/c2cf2467f71c678cfc8a6b9ac9241e5e44a01940da8fbb17fc\n",
+            "Successfully built pyspark\n",
+            "Installing collected packages: pyspark\n",
+            "Successfully installed pyspark-3.5.0\n"
+          ]
+        }
+      ],
+      "source": [
+        "pip install pyspark"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from pyspark.sql import SparkSession\n",
+        "import pyspark.sql.functions as F\n",
+        "#Creiamo una sessione\n",
+        "\n",
+        "\n",
+        "spark = SparkSession.builder.appName('esercizio_1').getOrCreate()"
+      ],
+      "metadata": {
+        "id": "ORie8PJ9HsfK"
+      },
+      "execution_count": 3,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "sc = spark.sparkContext #creiamo una sezione spark contect"
+      ],
+      "metadata": {
+        "id": "E-OUckdjHsu3"
+      },
+      "execution_count": 4,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df_departments = spark.read.csv('departments.csv', inferSchema=True, header = True)\n",
+        "df_departments.show(5)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "6CIMRtAAHszi",
+        "outputId": "fa70288b-1920-4c7e-d22a-ee20a8172bfa"
+      },
+      "execution_count": 6,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+-------------+---------------+----------+-----------+\n",
+            "|department_id|department_name|manager_id|location_id|\n",
+            "+-------------+---------------+----------+-----------+\n",
+            "|           10| Administration|       200|       1700|\n",
+            "|           20|      Marketing|       201|       1800|\n",
+            "|           30|     Purchasing|       114|       1700|\n",
+            "|           40|Human Resources|       203|       2400|\n",
+            "|           50|       Shipping|       121|       1500|\n",
+            "+-------------+---------------+----------+-----------+\n",
+            "only showing top 5 rows\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df_countries = spark.read.csv('countries.csv', inferSchema=True, header = True)\n",
+        "df_countries.show(5)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "83IPo2IWHs3J",
+        "outputId": "6493d058-a48a-4488-b2e9-cab523870b60"
+      },
+      "execution_count": 7,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+----------+------------+---------+\n",
+            "|country_id|country_name|region_id|\n",
+            "+----------+------------+---------+\n",
+            "|        AR|   Argentina|        2|\n",
+            "|        AU|   Australia|        3|\n",
+            "|        BE|     Belgium|        1|\n",
+            "|        BR|      Brazil|        2|\n",
+            "|        CA|      Canada|        2|\n",
+            "+----------+------------+---------+\n",
+            "only showing top 5 rows\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df_employees = spark.read.csv('employees.csv', inferSchema=True, header = True)\n",
+        "df_employees.show(5)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "AzvdygLJJe96",
+        "outputId": "775e4055-7b80-4ce8-bcd7-ad0f0f8a7342"
+      },
+      "execution_count": 8,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---------+----------+---------+--------+------------+----------+-------+------+--------------+----------+-------------+\n",
+            "|employ_id|first_name|last_name|   email|phone_number| hire_date| job_id|salary|commission_pct|manager_id|department_id|\n",
+            "+---------+----------+---------+--------+------------+----------+-------+------+--------------+----------+-------------+\n",
+            "|      100|    Steven|     King|   SKING|515.123.4567|2003-06-17|AD_PRES| 24000|          NULL|      NULL|           90|\n",
+            "|      101|     Neena|  Kochhar|NKOCHHAR|515.123.4568|2005-09-21|  AD_VP| 17000|          NULL|       100|           90|\n",
+            "|      102|       Lex|  De Haan| LDEHAAN|515.123.4569|2001-01-13|  AD_VP| 17000|          NULL|       100|           90|\n",
+            "|      103| Alexander|   Hunold| AHUNOLD|590.423.4567|2006-01-03|IT_PROG|  9000|          NULL|       102|           60|\n",
+            "|      104|     Bruce|    Ernst|  BERNST|590.423.4568|2007-05-21|IT_PROG|  6000|          NULL|       103|           60|\n",
+            "+---------+----------+---------+--------+------------+----------+-------+------+--------------+----------+-------------+\n",
+            "only showing top 5 rows\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df_job_history = spark.read.csv('job_history.csv', inferSchema=True, header = True)\n",
+        "df_job_history.show(5)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "ZL3k6fpEJfAE",
+        "outputId": "bff566de-170d-4321-ed15-dfcf00b6cb03"
+      },
+      "execution_count": 9,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+-----------+----------+----------+----------+-------------+\n",
+            "|employee_id|start_date| end_date`|    job_id|department_id|\n",
+            "+-----------+----------+----------+----------+-------------+\n",
+            "|        102|1993-01-13|1998-07-24|   IT_PROG|           60|\n",
+            "|        101|1989-09-21|1993-10-27|AC_ACCOUNT|          110|\n",
+            "|        101|1993-10-28|1997-03-15|    AC_MGR|          110|\n",
+            "|        201|1996-02-17|1999-12-19|    MK_REP|           20|\n",
+            "|        114|1998-03-24|1999-12-31|  ST_CLERK|           50|\n",
+            "+-----------+----------+----------+----------+-------------+\n",
+            "only showing top 5 rows\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df_jobs = spark.read.csv('jobs.csv', inferSchema=True, header = True)\n",
+        "df_jobs.show(5)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "3NFUfXpdJfCW",
+        "outputId": "2db39df0-b0ef-4716-850e-b951e8177369"
+      },
+      "execution_count": 10,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+----------+--------------------+----------+----------+\n",
+            "|    job_id|           job_title|min_salary|max_salary|\n",
+            "+----------+--------------------+----------+----------+\n",
+            "|   AD_PRES|           President|     20000|     40000|\n",
+            "|     AD_VP|Administration Vi...|     15000|     30000|\n",
+            "|   AD_ASST|Administration As...|      3000|      6000|\n",
+            "|    FI_MGR|     Finance Manager|      8200|     16000|\n",
+            "|FI_ACCOUNT|          Accountant|      4200|      9000|\n",
+            "+----------+--------------------+----------+----------+\n",
+            "only showing top 5 rows\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df_locations = spark.read.csv('locations.csv', inferSchema=True, header = True)\n",
+        "df_locations.show(5)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "oxSh2EMQJfFu",
+        "outputId": "9692a468-0a13-4519-8c6d-914ff31a7bc9"
+      },
+      "execution_count": 11,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+-----------+--------------------+-----------+---------+----------------+----------+\n",
+            "|location_id|      street_address|postal_code|     city|  state_province|country_id|\n",
+            "+-----------+--------------------+-----------+---------+----------------+----------+\n",
+            "|       1000|1297 Via Cola di Rie|        989|     Roma|            NULL|        IT|\n",
+            "|       1100|93091 Calle della...|      10934|   Venice|            NULL|        IT|\n",
+            "|       1200|    2017 Shinjuku-ku|       1689|    Tokyo|Tokyo Prefecture|        JP|\n",
+            "|       1300|     9450 Kamiya-cho|       6823|Hiroshima|            NULL|        JP|\n",
+            "|       1400| 2014 Jabberwocky Rd|      26192|Southlake|           Texas|        US|\n",
+            "+-----------+--------------------+-----------+---------+----------------+----------+\n",
+            "only showing top 5 rows\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df_regions = spark.read.csv('regions.csv', inferSchema=True, header = True)\n",
+        "df_regions.show(5)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "wVaJ4ReNKAPO",
+        "outputId": "8a28c4e9-b420-413d-eda3-513c50b5cd93"
+      },
+      "execution_count": 13,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---------+--------------------+\n",
+            "|REGION_ID|         REGION_NAME|\n",
+            "+---------+--------------------+\n",
+            "|        1|              Europe|\n",
+            "|        2|            Americas|\n",
+            "|        3|                Asia|\n",
+            "|        4|Middle East and A...|\n",
+            "+---------+--------------------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#vedere solo la descrizione della colonna salary\n",
+        "df_employees.describe('salary').show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "hNKbZWgCMqDt",
+        "outputId": "ab606db2-a2b9-42ab-8dd5-3b05e9cc0683"
+      },
+      "execution_count": 14,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+-------+-----------------+\n",
+            "|summary|           salary|\n",
+            "+-------+-----------------+\n",
+            "|  count|              107|\n",
+            "|   mean|6461.682242990654|\n",
+            "| stddev|3909.365746459057|\n",
+            "|    min|             2100|\n",
+            "|    max|            24000|\n",
+            "+-------+-----------------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df_jobs.createOrReplaceTempView(\"tbl_jobs\")\n",
+        "df_departments.createOrReplaceTempView(\"tbl_departments\")\n",
+        "df_locations.createOrReplaceTempView(\"tbl_locations\")\n",
+        "df_employees.createOrReplaceTempView(\"tbl_employees\")\n",
+        "df_regions.createOrReplaceTempView(\"tbl_regions\")\n",
+        "df_job_history.createOrReplaceTempView(\"tbl_job_history\")\n",
+        "df_countries.createOrReplaceTempView(\"tbl_countries\")"
+      ],
+      "metadata": {
+        "id": "IRZKu_nMMqF5"
+      },
+      "execution_count": 15,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#Divide i le colonne della tabella df_employees\n",
+        "numeric_columns = list()    #colonne numeriche\n",
+        "categorical_column = list() #colonne categoriche\n",
+        "for col_ in df_employees.columns:\n",
+        "    if df_employees.select(col_).dtypes[0][1] != \"string\":  #type della colonna non stringa\n",
+        "        numeric_columns.append(col_)\n",
+        "    else:\n",
+        "        categorical_column.append(col_)\n",
+        "print(\"Numeric columns\",numeric_columns)\n",
+        "print(\"categorical columns\",categorical_column)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "sPiuIVR9MqIS",
+        "outputId": "0279cd90-7e2a-4808-c766-ae9931199ded"
+      },
+      "execution_count": 19,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Numeric columns ['employ_id', 'hire_date', 'salary', 'commission_pct', 'manager_id', 'department_id']\n",
+            "categorical columns ['first_name', 'last_name', 'email', 'phone_number', 'job_id']\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#nella countries quanti valori ci sono\n",
+        "df_countries.count()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "RQ9SNemhQZCo",
+        "outputId": "6b90e105-303e-48de-d13d-a83a42372348"
+      },
+      "execution_count": 28,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "25"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 28
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#quanti sono null\n",
+        "from pyspark.sql.functions import isnan,when,count,col\n",
+        "df_countries.select([count(when(isnan(c),c)).alias(c) for c in df_countries.columns]).show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Kax8fDG3MqKy",
+        "outputId": "ca2aa6d8-4fb0-4005-ff94-d2c5f43e2ce5"
+      },
+      "execution_count": 27,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+----------+------------+---------+\n",
+            "|country_id|country_name|region_id|\n",
+            "+----------+------------+---------+\n",
+            "|         0|           0|        0|\n",
+            "+----------+------------+---------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "1.Elencare email e adress dei lavoratori che hanno un salary tra 2000 e 3000 in Americas\n",
+        "\n",
+        "2-Quanti  impiegati di Marketing e Administration lavorano in EU, Asia o Americas?\n",
+        "\n",
+        "3-Elencare nome, cognome, dipartimento e dove lavora , in una nuova colonna salary*12 AS salario_annuale dell IT_PROG e salary>4700\n",
+        "\n",
+        "4-Sostituire tutti i valori null di state_province con 'vuoto'\n",
+        "\n",
+        "5-Qual è la città dove si guadagna di più?"
+      ],
+      "metadata": {
+        "id": "ZYt9NyG8QzDb"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#1.Elencare email e adress dei lavoratori che hanno un salary tra 2000 e 3000 in Americas\n",
+        "df_regions[df_regions.REGION_NAME.isin(\"Americas\")]\\\n",
+        ".join(df_countries, on='region_id')\\\n",
+        ".join(df_locations, on='country_id')\\\n",
+        ".join(df_departments, on='location_id')\\\n",
+        ".join(df_employees, on='department_id')\\\n",
+        ".filter(F.col(\"salary\").between(2000,3000))\\\n",
+        ".select('email','last_name','street_address','salary', 'city', 'REGION_NAME')\\\n",
+        ".show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "yX-w_OoXRO_i",
+        "outputId": "8be4d485-98c6-480a-a2d9-2431984e43ce"
+      },
+      "execution_count": 46,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+--------+----------+-------------------+------+-------------------+-----------+\n",
+            "|   email| last_name|     street_address|salary|               city|REGION_NAME|\n",
+            "+--------+----------+-------------------+------+-------------------+-----------+\n",
+            "|KCOLMENA|Colmenares|    2004 Charade Rd|  2500|            Seattle|   Americas|\n",
+            "| GHIMURO|    Himuro|    2004 Charade Rd|  2600|            Seattle|   Americas|\n",
+            "| STOBIAS|    Tobias|    2004 Charade Rd|  2800|            Seattle|   Americas|\n",
+            "|  SBAIDA|     Baida|    2004 Charade Rd|  2900|            Seattle|   Americas|\n",
+            "|  DGRANT|     Grant|2011 Interiors Blvd|  2600|South San Francisco|   Americas|\n",
+            "|DOCONNEL|  OConnell|2011 Interiors Blvd|  2600|South San Francisco|   Americas|\n",
+            "| KFEENEY|    Feeney|2011 Interiors Blvd|  3000|South San Francisco|   Americas|\n",
+            "|  VJONES|     Jones|2011 Interiors Blvd|  2800|South San Francisco|   Americas|\n",
+            "|RPERKINS|   Perkins|2011 Interiors Blvd|  2500|South San Francisco|   Americas|\n",
+            "|  TGATES|     Gates|2011 Interiors Blvd|  2900|South San Francisco|   Americas|\n",
+            "| ACABRIO|    Cabrio|2011 Interiors Blvd|  3000|South San Francisco|   Americas|\n",
+            "|  GGEONI|     Geoni|2011 Interiors Blvd|  2800|South San Francisco|   Americas|\n",
+            "|MSULLIVA|  Sullivan|2011 Interiors Blvd|  2500|South San Francisco|   Americas|\n",
+            "| PVARGAS|    Vargas|2011 Interiors Blvd|  2500|South San Francisco|   Americas|\n",
+            "|  RMATOS|     Matos|2011 Interiors Blvd|  2600|South San Francisco|   Americas|\n",
+            "|  JPATEL|     Patel|2011 Interiors Blvd|  2500|South San Francisco|   Americas|\n",
+            "|    JSEO|       Seo|2011 Interiors Blvd|  2700|South San Francisco|   Americas|\n",
+            "|HPHILTAN|Philtanker|2011 Interiors Blvd|  2200|South San Francisco|   Americas|\n",
+            "|    KGEE|       Gee|2011 Interiors Blvd|  2400|South San Francisco|   Americas|\n",
+            "| MROGERS|    Rogers|2011 Interiors Blvd|  2900|South San Francisco|   Americas|\n",
+            "+--------+----------+-------------------+------+-------------------+-----------+\n",
+            "only showing top 20 rows\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#2-Quanti  impiegati di Marketing e Administration lavorano in EU, Asia O Americas?\n",
+        "#usiamo le view, perche?\n",
+        "spark.sql('''SELECT count(employ_id)\n",
+        "FROM tbl_regions INNER JOIN tbl_countries USING(region_id)\n",
+        "INNER JOIN tbl_locations USING(country_id)\n",
+        "INNER JOIN tbl_departments USING(location_id)\n",
+        "INNER JOIN tbl_employees USING(department_id)\n",
+        "WHERE (department_name='Marketing' OR department_name='Administration') AND (REGION_NAME='Europe' OR REGION_NAME='Americas' OR REGION_NAME='Asia') ''').show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "sK_b-p1PMqNY",
+        "outputId": "85ffb2ae-952d-4c99-c27a-d1c022ea158c"
+      },
+      "execution_count": 45,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+----------------+\n",
+            "|count(employ_id)|\n",
+            "+----------------+\n",
+            "|               3|\n",
+            "+----------------+\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "employ_"
+      ],
+      "metadata": {
+        "id": "S38HdNY0MqQ3"
+      },
+      "execution_count": null,
+      "outputs": []
+    }
+  ]
+}
